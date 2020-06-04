@@ -7,19 +7,19 @@ const produceNewsData = function () {
     let newsList = []
     for (let i = 0; i < 3; i++) {
         let newNewsObject = {}
-        if(i === 0){
+        if (i === 0) {
             newNewsObject.path = '/add/article';
-            newNewsObject.name  = 'add-article';
+            newNewsObject.name = 'add-article';
             newNewsObject.component = 'modules/add/article/article';
         }
-        if(i === 1){
+        if (i === 1) {
             newNewsObject.path = '/detail/article';
-            newNewsObject.name  = 'detail-article';
+            newNewsObject.name = 'detail-article';
             newNewsObject.component = 'modules/detail/article/article'
         }
-        if(i === 2){
+        if (i === 2) {
             newNewsObject.path = '/edit/article';
-            newNewsObject.name  = 'edit-article';
+            newNewsObject.name = 'edit-article';
             newNewsObject.component = 'modules/edit/article/article'
         }
         newsList.push(newNewsObject)
@@ -27,5 +27,19 @@ const produceNewsData = function () {
     return newsList;
 }
 
+// 理解返回的res
+Mock.mock('/mock/menu', {
+    data: {
+        list: produceNewsData
+    },
+    code: 1,
+    msg: '请求成功'
+})
 
-Mock.mock('/mock/menu', {data:{list:produceNewsData},code:1,msg:'请求成功'})
+// Mock.mock('/mock/menu', {
+//     data: {
+//         list: produceNewsData
+//     },
+//     code: 200,
+//     message: '请求成功'
+// })

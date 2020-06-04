@@ -30,8 +30,8 @@ http.interceptors.request.use(function (config) {
 
 /**
  * 状态码判断 具体根据当前后台返回业务来定
- * @param {*请求状态码} status 
- * @param {*错误信息} err 
+ * @param {*请求状态码} status
+ * @param {*错误信息} err
  */
 const errorHandle = (status, response) => {
     console.log(response)
@@ -39,7 +39,12 @@ const errorHandle = (status, response) => {
         case 401:
             break;
         case 404:
-            vm.$message({ message: `请求路径不存在 ${response.request.responseURL}`, type: 'warning', duration: 1000 * 10, showClose: true });
+            vm.$message({
+                message: `请求路径不存在 ${response.request.responseURL}`,
+                type: 'warning',
+                duration: 1000 * 10,
+                showClose: true
+            });
             break;
         default:
             console.log(err);
@@ -53,28 +58,39 @@ http.interceptors.response.use(response => {
         if (response.data.code == succeeCode) {
             return Promise.resolve(response);
         } else {
-            vm.$message({ message: response.data.msg, type: 'warning', duration: 1000 * 10, showClose: true });
+            vm.$message({
+                message: response.data.msg,
+                type: 'warning',
+                duration: 1000 * 10,
+                showClose: true
+            });
             return Promise.reject(response)
         }
     } else {
         return Promise.reject(response)
     }
 }, error => {
-    const { response } = error;
+    const {
+        response
+    } = error;
     if (response) {
-        // 请求已发出，但是不在2xx的范围 
+        // 请求已发出，但是不在2xx的范围
         errorHandle(response.status, response);
         return Promise.reject(response);
     } else {
         // 处理断网的情况
         if (!window.navigator.onLine) {
-            vm.$message({ message: '你的网络已断开，请检查网络', type: 'warning' });
+            vm.$message({
+                message: '你的网络已断开，请检查网络',
+                type: 'warning'
+            });
         }
         return Promise.reject(error);
     }
 })
 
-
+// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+// url 统一处理    get、post参数统一处理
 /**
  * 请求地址处理
  */
@@ -94,7 +110,6 @@ http.adornParams = (params = {}, openDefultParams = true) => {
     return openDefultParams ? merge(defaults, params) : params
 }
 
-
 /**
  * post请求数据处理
  * @param {*} data 数据对象
@@ -110,7 +125,27 @@ http.adornData = (data = {}, openDefultdata = true, contentType = 'json') => {
     data = openDefultdata ? merge(defaults, data) : data
     return contentType === 'json' ? JSON.stringify(data) : qs.stringify(data)
 }
+//  @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
+/**
+ * windGet请求
+ * @param {String} url [请求地址]
+ * @param {Object} params [请求携带参数]
+ */
+http.windGet = function (url, params) {
+    url += '?rand=' + new Date().getTime()
+    return new Promise((resolve, reject) => {
+        http.get(http.adornUrl(url), {
+                params: params
+            })
+            .then(res => {
+                resolve(res.data)
+            })
+            .catch(error => {
+                reject(error)
+            })
+    })
+}
 
 /**
  * windPost请求
@@ -118,12 +153,28 @@ http.adornData = (data = {}, openDefultdata = true, contentType = 'json') => {
  * @param {Object} params [请求携带参数]
  */
 http.windPost = function (url, params) {
+    console.log('url---' + url)
+    console.log('params---' + params)
     return new Promise((resolve, reject) => {
+        console.log('resolve---')
+        console.log(resolve)
+        console.log(reject)
+        console.log('reject---')
         http.post(http.adornUrl(url), params)
             .then(res => {
+                console.log('res--- start')
+                console.log(res)
+                /**
+                 *
+                 *
+                 *
+                 */
                 resolve(res.data)
+                console.log('res--- end')
             })
             .catch(error => {
+                console.log('error--- ')
+                console.log(error)
                 reject(error)
             })
     })
@@ -135,35 +186,20 @@ http.windPost = function (url, params) {
  * @param {String} url [请求地址]
  * @param {Object} params [请求携带参数]
  */
-http.windJsonPost = function (url, params) {
-    return new Promise((resolve, reject) => {
-        http.post(http.adornUrl(url), http.adornParams(params))
-            .then(res => {
-                resolve(res.data)
-            })
-            .catch(error => {
-                reject(error)
-            })
-    })
-}
+// http.windJsonPost = function (url, params) {
+//     return new Promise((resolve, reject) => {
+//         http.post(http.adornUrl(url), http.adornParams(params))
+//             .then(res => {
+//                 resolve(res.data)
+//             })
+//             .catch(error => {
+//                 reject(error)
+//             })
+//     })
+// }
 
 
-/**
- * windGet请求
- * @param {String} url [请求地址]
- * @param {Object} params [请求携带参数]
- */
-http.windGet = function (url, params) {
-    return new Promise((resolve, reject) => {
-        http.get(http.adornUrl(url), { params: params })
-            .then(res => {
-                resolve(res.data)
-            })
-            .catch(error => {
-                reject(error)
-            })
-    })
-}
+
 
 /**
  * 上传图片
